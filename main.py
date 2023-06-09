@@ -33,11 +33,14 @@ class ApiClass:
         self.name = class_name;
         self.json = fetchClassJson(class_name);
         self.api_reference = self.json.get("apiReference");
+        self.properties = self.api_reference.get("properties");
+        self.inherits = self.api_reference.get("inherits");
+
         api_class_lookup[class_name] = self;
 
     def getUniqueProperties(self):
         unique_properties = [];
-        for prop in self.api_reference.get("properties"):
+        for prop in self.properties:
             name = prop.get("name");
             if name.startswith(self.name + "."):
                 name = name[len(self.name) + 1:];
@@ -52,7 +55,7 @@ class ApiClass:
 
     def getAllProperties(self):
         all_properties = self.getUniqueProperties();
-        for class_name in self.api_reference.get("inherits"):
+        for class_name in self.inherits:
             for prop in apiClass(class_name).getAllProperties():
                 all_properties.append(prop);
 
@@ -67,7 +70,8 @@ result_json = {};
 def addToResult(class_name):
     print("fetching " + class_name);
     try:
-        result_json[class_name] = apiClass(class_name).getAllProperties();
+        api_class = apiClass(class_name);
+        result_json[class_name] = {"inherits": api_class.inherits, "properties": api_class.getUniqueProperties()};
     except Exception as e:
         print("failed to fetch " + class_name + ": " + str(e));
 
