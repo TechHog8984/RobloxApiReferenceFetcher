@@ -19,7 +19,6 @@ for key in decoded_document:
         if ("https://create.roblox.com/docs/reference/engine/classes/" in learn_more_link) and ("#" not in learn_more_link) and ("CSGOptions" not in learn_more_link):
             class_list.append(key.replace("@roblox/globaltype/", ""));
 
-# build_id = input("BUILD ID: ");
 def getBuildId():
     request = requests.get("https://create.roblox.com/docs/reference/engine/datatypes/Axes");
     text = request.text;
@@ -60,14 +59,6 @@ class ApiClass:
 
         return unique_properties;
 
-    def getAllProperties(self):
-        all_properties = self.getUniqueProperties();
-        for class_name in self.inherits:
-            for prop in apiClass(class_name).getAllProperties():
-                all_properties.append(prop);
-
-        return all_properties;
-
 def apiClass(class_name):
     if api_class_lookup.get(class_name):
         return api_class_lookup[class_name];
@@ -91,6 +82,10 @@ for thread in threads:
 for thread in threads:
     thread.join();
 
+print("Done fetching! Writing to file...");
+
 with open("result.json", "w") as result_file:
     result_file.write(jsonEncode(result_json));
     result_file.close();
+
+print("Done! BUILD ID: " + build_id);
