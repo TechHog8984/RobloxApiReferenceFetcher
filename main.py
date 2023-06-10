@@ -1,4 +1,4 @@
-import requests, os;
+import requests, os, re;
 from json import loads as jsonDecode;
 from json import dumps as jsonEncode;
 from threading import Thread;
@@ -19,10 +19,17 @@ for key in decoded_document:
         if ("https://create.roblox.com/docs/reference/engine/classes/" in learn_more_link) and ("#" not in learn_more_link) and ("CSGOptions" not in learn_more_link):
             class_list.append(key.replace("@roblox/globaltype/", ""));
 
-url_id = input("URL ID: ");
+# build_id = input("BUILD ID: ");
+def getBuildId():
+    request = requests.get("https://create.roblox.com/docs/reference/engine/datatypes/Axes");
+    text = request.text;
+    match = re.search('"buildId":"(\w+)"', text);
+    return match.group(1);
+
+build_id = getBuildId();
 
 def fetchClass(class_name):
-    url = f"https://create.roblox.com/docs/_next/data/{url_id}/reference/engine/classes/{class_name}.json";
+    url = f"https://create.roblox.com/docs/_next/data/{build_id}/reference/engine/classes/{class_name}.json";
     return requests.get(url);
 def fetchClassJson(class_name):
     return fetchClass(class_name).json().get("pageProps").get("data");
